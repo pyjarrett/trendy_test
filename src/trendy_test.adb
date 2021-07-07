@@ -4,10 +4,33 @@ with Ada.Text_IO;
 
 package body Trendy_Test is
 
-    procedure Register (T        : in out Test'Class;
-                        Name     : String;
-                        Disabled : Boolean := False) is
+    procedure Register (Op           : in out Operation'Class;
+                        Name         : String;
+                        Disabled     : Boolean := False;
+                        Parallelize  : Boolean := True) is
     begin
+        null;
+    end Register;
+    pragma Unreferenced (Register);
+
+    overriding
+    procedure Register (T           : in out List;
+                        Name        : String;
+                        Disabled    : Boolean := False;
+                        Parallelize : Boolean := True) is
+    begin
+        pragma Unreferenced (T, Disabled, Parallelize);
+        Ada.Text_IO.Put_Line (Name);
+    end Register;
+
+    overriding
+    procedure Register (T           : in out Test;
+                        Name        : String;
+                        Disabled    : Boolean := False;
+                        Parallelize : Boolean := True) is
+    begin
+        pragma Unreferenced(Parallelize);
+
         T.Name := ASU.To_Unbounded_String (Name);
 
         if Disabled then
@@ -15,35 +38,35 @@ package body Trendy_Test is
         end if;
     end Register;
 
-    procedure Report_Failure (T : in out Test'Class; Left : String; Right : String) is
+    procedure Report_Failure (Op : in out Operation'Class; Message : String) is
     begin
-        pragma Unreferenced (T);
-        Ada.Text_IO.Put_Line (Left & " /= " & Right);
+        pragma Unreferenced (Op);
+        Ada.Text_IO.Put_Line (Message);
     end Report_Failure;
 
-    procedure Require (T : in out Test'Class; Condition : Boolean) is
+    procedure Require (Op : in out Operation'Class; Condition : Boolean) is
     begin
-        pragma Unreferenced(T);
+        pragma Unreferenced(Op);
         if not Condition then
             raise Test_Failure;
         end if;
     end Require;
 
-    procedure Require_Equal_Discrete(T : in out Test'Class; Left : in V; Right : in V) is
+    procedure Require_Discrete(Op : in out Operation'Class; Left : in T; Right : in T) is
     begin
-        if Left /= Right then
-            T.Report_Failure (Left'Image, Right'Image);
+        if not Comparison(Left, Right) then
+            Op.Report_Failure (Left'Image & ' ' & Operand & ' ' & Right'Image);
             raise Test_Failure;
         end if;
-    end Require_Equal_Discrete;
+    end Require_Discrete;
 
-    procedure Require_Equal(T : in out Test'Class; Left : V; Right : V) is
+    procedure Require_EQ(Op : in out Operation'Class; Left : T; Right : T) is
     begin
         if Left /= Right then
-            T.Report_Failure (Image(Left), Image(Right));
+            Op.Report_Failure (Image(Left) & " /= " & Image(Right));
             raise Test_Failure;
         end if;
-    end Require_Equal;
+    end Require_EQ;
 
     function "and" (Left, Right: Test_Result) return Test_Result is
     begin

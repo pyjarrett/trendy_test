@@ -3,7 +3,10 @@ with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
 
 package body Trendy_Test is
-    function Location (File : String; Line : Natural) return String is (File & ':' & Line'Image);
+
+    package body Locations is
+        function Location (File : String; Line : Natural) return String is (File & ':' & Line'Image);
+    end Locations;
 
     procedure Register (Op           : in out Operation'Class;
                         Name         : String := Value(Subprogram_Name);

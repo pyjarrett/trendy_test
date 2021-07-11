@@ -8,17 +8,20 @@ package Trendy_Test is
     type Operation is limited interface;
     -- Base class for all operations to be done on a test.
 
+    package Locations is
+        subtype Char_Ptr is Interfaces.C.Strings.chars_ptr;
+        function File_Line return Natural;
+        function File_Name return Char_Ptr;
+        function Subprogram_Name return Char_Ptr;
+        function Value (Str : Char_Ptr) return String renames Interfaces.C.Strings.Value;
+        function Location (File : String; Line : Natural) return String;
 
-    subtype Char_Ptr is Interfaces.C.Strings.chars_ptr;
-    function File_Line return Natural;
-    function File_Name return Char_Ptr;
-    function Subprogram_Name return Char_Ptr;
-    function Value (Str : Char_Ptr) return String renames Interfaces.C.Strings.Value;
-    function Location (File : String; Line : Natural) return String;
+        pragma Import (Intrinsic, File_Line, "__builtin_LINE");
+        pragma Import (Intrinsic, File_Name, "__builtin_FILE");
+        pragma Import (Intrinsic, Subprogram_Name, "__builtin_FUNCTION");
+    end Locations;
+    use Locations;
 
-    pragma Import (Intrinsic, File_Line, "__builtin_LINE");
-    pragma Import (Intrinsic, File_Name, "__builtin_FILE");
-    pragma Import (Intrinsic, Subprogram_Name, "__builtin_FUNCTION");
     ---------------------------------------------------------------------------
     --
     ---------------------------------------------------------------------------

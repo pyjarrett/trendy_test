@@ -53,3 +53,16 @@ package body My_Tests is
     end All_Tests;
 end My_Tests;
 ```
+
+## Example Output
+
+```
+D:\dev\ada\trendy_command_line\bin\trendy_command_line_test_main
+[ PASS ] trendy_command_line_tests.test_is_short_option
+[ PASS ] trendy_command_line_tests.test_is_long_option
+[ PASS ] trendy_command_line_tests.test_boolean_option_no_args
+[ PASS ] trendy_command_line_tests.test_is_short_option_or_group
+[ FAIL ] trendy_command_line_tests.test_boolean_option_defaults
+         ASSERTION FAILED at D:\dev\ada\trendy_command_line\src\trendy_command_line_tests.adb: 87
+Results: Passed:  4 /  5
+```

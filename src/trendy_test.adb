@@ -42,10 +42,14 @@ package body Trendy_Test is
         end if;
     end Register;
 
-    procedure Report_Failure (Op : in out Operation'Class; Message : String) is
+    procedure Report_Failure (Op      : in out Operation'Class;
+                              Message : String;
+                              File    : String;
+                              Line    : Natural) is
+        Error : constant String := (if Message /= "" then Message else "Condition false");
     begin
         pragma Unreferenced (Op);
-        Ada.Text_IO.Put_Line (Message);
+        raise Test_Failure with "Assertion Failed: (" & Error & ") at " & Location (File, Line);
     end Report_Failure;
 
     procedure Require (Op : in out Operation'Class; Condition : Boolean;
@@ -53,9 +57,8 @@ package body Trendy_Test is
                        Line      : Natural := File_Line)
  is
     begin
-        pragma Unreferenced(Op);
         if not Condition then
-            raise Test_Failure with "ASSERTION FAILED at " & Location (File, Line);
+            Op.Report_Failure("", File, Line);
         end if;
     end Require;
 
@@ -64,11 +67,10 @@ package body Trendy_Test is
                                Right : in T;
                                File  : String := Value(File_Name);
                                Line  : Natural := File_Line) is
+        Message : constant String := Left'Image & ' ' & Operand & ' ' & Right'Image;
     begin
-        pragma Unreferenced (Op);
         if not Comparison(Left, Right) then
-            raise Test_Failure with "ASSERTION FAILED (" & Left'Image & ' ' &
-                Operand & ' ' & Right'Image & ") " & Location(File, Line);
+            Op.Report_Failure (Message, File, Line);
         end if;
     end Require_Discrete;
 
@@ -77,10 +79,10 @@ package body Trendy_Test is
                          Right : T;
                          File  : String := Value(File_Name);
                          Line  : Natural := File_Line) is
+        Message : constant String := Image(Left) & " /= " & Image(Right);
     begin
         if Left /= Right then
-            Op.Report_Failure (Image(Left) & " /= " & Image(Right) & ' ' & Location (File, Line));
-            raise Test_Failure;
+            Op.Report_Failure (Message, File, Line);
         end if;
     end Require_EQ;
 

@@ -56,7 +56,10 @@ package Trendy_Test is
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True);
 
-    procedure Report_Failure (Op : in out Operation'Class; Message : String);
+    procedure Report_Failure (Op      : in out Operation'Class;
+                              Message : String;
+                              File    : String;
+                              Line    : Natural);
     -- Something bad happened.
 
     procedure Require (Op        : in out Operation'Class;

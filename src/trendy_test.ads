@@ -14,6 +14,7 @@ package Trendy_Test is
     function File_Name return Char_Ptr;
     function Subprogram_Name return Char_Ptr;
     function Value (Str : Char_Ptr) return String renames Interfaces.C.Strings.Value;
+    function Location (File : String; Line : Natural) return String;
 
     pragma Import (Intrinsic, File_Line, "__builtin_LINE");
     pragma Import (Intrinsic, File_Name, "__builtin_FILE");
@@ -58,14 +59,18 @@ package Trendy_Test is
     procedure Require (Op        : in out Operation'Class;
                        Condition : Boolean;
                        File      : String := Value(File_Name);
-                       Line      : Integer := File_Line);
+                       Line      : Natural := File_Line);
     -- A boolean check which must be passed for the test to continue.
 
     generic
         type T is (<>);
         Operand : String;
         with function Comparison(Left : T; Right : T) return Boolean;
-    procedure Require_Discrete(Op : in out Operation'Class; Left : in T; Right : in T);
+    procedure Require_Discrete(Op    : in out Operation'Class;
+                               Left  : in T;
+                               Right : in T;
+                               File  : String := Value(File_Name);
+                               Line  : Natural := File_Line);
 
     generic
         type T is private;

@@ -3,6 +3,7 @@ with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
 
 package body Trendy_Test is
+    function Location (File : String; Line : Natural) return String is (File & ':' & Line'Image);
 
     procedure Register (Op           : in out Operation'Class;
                         Name         : String := Value(Subprogram_Name);
@@ -46,20 +47,25 @@ package body Trendy_Test is
 
     procedure Require (Op : in out Operation'Class; Condition : Boolean;
                        File      : String := Value(File_Name);
-                       Line      : Integer := File_Line)
+                       Line      : Natural := File_Line)
  is
     begin
         pragma Unreferenced(Op);
         if not Condition then
-            raise Test_Failure with "ASSERTION FAILED at " & File & ':' & Line'Image;
+            raise Test_Failure with "ASSERTION FAILED at " & Location (File, Line);
         end if;
     end Require;
 
-    procedure Require_Discrete(Op : in out Operation'Class; Left : in T; Right : in T) is
+    procedure Require_Discrete(Op    : in out Operation'Class;
+                               Left  : in T;
+                               Right : in T;
+                               File  : String := Value(File_Name);
+                               Line  : Natural := File_Line) is
     begin
+        pragma Unreferenced (Op);
         if not Comparison(Left, Right) then
-            Op.Report_Failure (Left'Image & ' ' & Operand & ' ' & Right'Image);
-            raise Test_Failure;
+            raise Test_Failure with "ASSERTION FAILED (" & Left'Image & ' ' &
+                Operand & ' ' & Right'Image & ") " & Location(File, Line);
         end if;
     end Require_Discrete;
 
@@ -102,7 +108,8 @@ package body Trendy_Test is
                     Put_Line ("[ SKIP ] " & Instance.Name);
                 when Error : Test_Failure =>
                     Put_Line ("[ FAIL ] " & Instance.Name);
-                    Put_Line (Ada.Exceptions.Exception_Information (Error));
+                    Put_Line ("         " & Ada.Exceptions.Exception_Message (Error));
+                    -- Put_Line (Ada.Exceptions.Exception_Information (Error));
                     Fails := Fails + 1;
             end;
         end loop;

@@ -72,10 +72,14 @@ package body Trendy_Test is
         end if;
     end Require_Discrete;
 
-    procedure Require_EQ(Op : in out Operation'Class; Left : T; Right : T) is
+    procedure Require_EQ(Op    : in out Operation'Class;
+                         Left  : T;
+                         Right : T;
+                         File  : String := Value(File_Name);
+                         Line  : Natural := File_Line) is
     begin
         if Left /= Right then
-            Op.Report_Failure (Image(Left) & " /= " & Image(Right));
+            Op.Report_Failure (Image(Left) & " /= " & Image(Right) & ' ' & Location (File, Line));
             raise Test_Failure;
         end if;
     end Require_EQ;

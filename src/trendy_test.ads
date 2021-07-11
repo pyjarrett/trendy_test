@@ -78,7 +78,11 @@ package Trendy_Test is
     generic
         type T is private;
         with function Image(Self : T) return String;
-    procedure Require_EQ(Op : in out Operation'Class; Left : T; Right : T);
+    procedure Require_EQ(Op    : in out Operation'Class;
+                         Left  : T;
+                         Right : T;
+                         File  : String := Value(File_Name);
+                         Line  : Natural := File_Line);
 
     ---------------------------------------------------------------------------
     --

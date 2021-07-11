@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: CI on ${{ matrix.os }}
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:    
+       - name: Checkout
+         uses: actions/checkout@v2
+       - name: ada-actions/toolchain
+         uses: ada-actions/toolchain@ce2021
+         with:
+           distrib: community
+           target: native
+       - name: alire-project/setup-alire
+         uses: alire-project/setup-alire@latest-stable
+       - name: Build
+         run: alr build

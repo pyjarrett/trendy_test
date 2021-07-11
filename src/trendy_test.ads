@@ -84,7 +84,7 @@ package Trendy_Test is
     --
     ---------------------------------------------------------------------------
 
-    type Test_Procedure is access procedure (Op : in out Test'Class);
+    type Test_Procedure is access procedure (Op : in out Operation'Class);
     -- Test procedures might be called with one of many test operations.  This could
     -- include gathering test names for filtering, or running the tests themselves.
 

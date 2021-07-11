@@ -1,17 +1,29 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
 
+with Interfaces.C.Strings;
+
 package Trendy_Test is
 
     type Operation is limited interface;
     -- Base class for all operations to be done on a test.
 
+
+    subtype Char_Ptr is Interfaces.C.Strings.chars_ptr;
+    function File_Line return Natural;
+    function File_Name return Char_Ptr;
+    function Subprogram_Name return Char_Ptr;
+    function Value (Str : Char_Ptr) return String renames Interfaces.C.Strings.Value;
+
+    pragma Import (Intrinsic, File_Line, "__builtin_LINE");
+    pragma Import (Intrinsic, File_Name, "__builtin_FILE");
+    pragma Import (Intrinsic, Subprogram_Name, "__builtin_FUNCTION");
     ---------------------------------------------------------------------------
     --
     ---------------------------------------------------------------------------
 
     procedure Register (Op           : in out Operation;
-                        Name        : String;
+                        Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is abstract;
     -- Indicates that the current method should be added to the test bank.
@@ -30,20 +42,23 @@ package Trendy_Test is
 
     overriding
     procedure Register (T           : in out List;
-                        Name        : String;
+                        Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True);
 
     overriding
     procedure Register (T           : in out Test;
-                        Name        : String;
+                        Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True);
 
     procedure Report_Failure (Op : in out Operation'Class; Message : String);
     -- Something bad happened.
 
-    procedure Require (Op : in out Operation'Class; Condition : Boolean);
+    procedure Require (Op        : in out Operation'Class;
+                       Condition : Boolean;
+                       File      : String := Value(File_Name);
+                       Line      : Integer := File_Line);
     -- A boolean check which must be passed for the test to continue.
 
     generic
@@ -76,6 +91,12 @@ package Trendy_Test is
     procedure Register (TG : in Test_Group);
 
     function Run return Test_Result;
+
+    --  with System.Machine_Code;
+    --  procedure Breakpoint is
+    --  begin
+    --      System.Machine_Code.Asm("int3", Volatile => True);
+    --  end Breakpoint;
 
 private
 

@@ -5,7 +5,7 @@ with Ada.Text_IO;
 package body Trendy_Test is
 
     procedure Register (Op           : in out Operation'Class;
-                        Name         : String;
+                        Name         : String := Value(Subprogram_Name);
                         Disabled     : Boolean := False;
                         Parallelize  : Boolean := True) is
     begin
@@ -15,7 +15,7 @@ package body Trendy_Test is
 
     overriding
     procedure Register (T           : in out List;
-                        Name        : String;
+                        Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is
     begin
@@ -25,7 +25,7 @@ package body Trendy_Test is
 
     overriding
     procedure Register (T           : in out Test;
-                        Name        : String;
+                        Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is
     begin
@@ -44,11 +44,14 @@ package body Trendy_Test is
         Ada.Text_IO.Put_Line (Message);
     end Report_Failure;
 
-    procedure Require (Op : in out Operation'Class; Condition : Boolean) is
+    procedure Require (Op : in out Operation'Class; Condition : Boolean;
+                       File      : String := Value(File_Name);
+                       Line      : Integer := File_Line)
+ is
     begin
         pragma Unreferenced(Op);
         if not Condition then
-            raise Test_Failure;
+            raise Test_Failure with "ASSERTION FAILED at " & File & ':' & Line'Image;
         end if;
     end Require;
 

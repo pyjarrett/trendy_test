@@ -33,14 +33,14 @@ end Trendy_Command_Line_Tests;
 package body My_Tests is
     procedure Test_Sample (T : in out Trendy_Test.Operation'Class) is
     begin
-        # Don't put anything above here you don't want run during listing/other ops.
+        -- Don't put anything above here you don't want run during listing/other ops.
         T.Register;
         T.Require (Some_Expression);
     end Test_Sample;
     
     procedure Test_Is_Disabled (T : in out Trendy_Test.Operation'Class) is
     begin
-        T.Register(Disabled => True);  # Disabled, don't run this test.
+        T.Register(Disabled => True);  -- Disabled, don't run this test.
         T.Require (Some_Expression);
     end Test_Sample;
     

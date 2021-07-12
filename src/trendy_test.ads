@@ -25,7 +25,6 @@ package Trendy_Test is
     ---------------------------------------------------------------------------
     --
     ---------------------------------------------------------------------------
-
     procedure Register (Op           : in out Operation;
                         Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
@@ -39,10 +38,18 @@ package Trendy_Test is
     -- Test Operations
     ---------------------------------------------------------------------------
 
+    type Gather is new Operation with private;
+
     type List is new Operation with private;
 
     type Test is new Operation with private;
     -- Runs tests on test procedures.
+
+    overriding
+    procedure Register (Self        : in out Gather;
+                        Name        : String := Value(Subprogram_Name);
+                        Disabled    : Boolean := False;
+                        Parallelize : Boolean := True);
 
     overriding
     procedure Register (T           : in out List;
@@ -97,11 +104,27 @@ package Trendy_Test is
 
     type Test_Group is array (Positive range <>) of Test_Procedure;
 
-    Test_Failure : exception;
-    Test_Disabled: exception;
+    package Test_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type   => Positive,
+                                                                 Element_Type => Test_Procedure);
 
-    type Test_Result is (Passed, Failed);
+    Test_Failure    : exception;
+    Test_Disabled   : exception;
+    Test_Registered : exception; -- Used by Gather for an early bail-out of test functions.
+
+    type Test_Result is (Passed, Failed, Skipped);
     function "and" (Left, Right: Test_Result) return Test_Result;
+
+    type Test_Report is record
+        Name   : Ada.Strings.Unbounded.Unbounded_String;
+        Status : Test_Result;
+        Passed_Assertions : Natural := 0;
+        Failed_Assertions : Natural := 0;
+        Failure : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
+        -- - Number of assertions checked
+        -- - Time duration of the test
+    end record;
+
+    function "<"(Left, Right : Test_Report) return Boolean;
 
     procedure Register (TG : in Test_Group);
 
@@ -121,6 +144,14 @@ private
                                                                      Element_Type => Test_Group);
 
     package ASU renames Ada.Strings.Unbounded;
+
+    type Gather is new Operation with record
+        -- Simplify the Register procedure call inside tests, by recording the
+        -- "current test" being registered.
+        Current_Test     : Test_Procedure;
+        Sequential_Tests : Test_Vectors.Vector;
+        Parallel_Tests   : Test_Vectors.Vector;
+    end record;
 
     type List is new Operation with null record;
 

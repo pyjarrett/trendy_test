@@ -79,6 +79,14 @@ package body Trendy_Test is
         raise Test_Failure with "Assertion Failed: (" & Error & ") at " & Location (File, Line);
     end Report_Failure;
 
+    procedure Fail (Op        : in out Operation'Class;
+                    Message   : String;
+                    File      : String := Value(File_Name);
+                    Line      : Natural := File_Line) is
+    begin
+        Op.Report_Failure (Message, File, Line);
+    end Fail;
+
     procedure Require (Op : in out Operation'Class; Condition : Boolean;
                        File      : String := Value(File_Name);
                        Line      : Natural := File_Line) is

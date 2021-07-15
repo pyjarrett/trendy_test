@@ -69,6 +69,12 @@ package Trendy_Test is
                               Line    : Natural);
     -- Something bad happened.
 
+    -- Forcibly fail a test.
+    procedure Fail (Op        : in out Operation'Class;
+                    Message   : String;
+                    File      : String := Value(File_Name);
+                    Line      : Natural := File_Line);
+
     procedure Require (Op        : in out Operation'Class;
                        Condition : Boolean;
                        File      : String := Value(File_Name);

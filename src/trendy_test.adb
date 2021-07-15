@@ -259,7 +259,7 @@ package body Trendy_Test is
                 exception
                     when Test_Disabled =>
                         Results.Add ((Instance.Name, Skipped, 0, 0, others => <>));
-                    when Error : Test_Failure =>
+                    when Error : others =>
                         Results.Add ((Instance.Name, Failed, 0, 0,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));

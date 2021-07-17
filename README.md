@@ -4,6 +4,13 @@ Minimum Effort Ada Unit Testing Library
 
 [![Build Status](https://github.com/pyjarrett/trendy_test/actions/workflows/build.yml/badge.svg)](https://github.com/pyjarrett/trendy_test/actions)
 
+## Features
+
+- Minimum setup
+- Parallelization of tests
+- Randomization of test order to find dependencies between tests
+- No generated code or scripts needed
+
 ## Example
 
 ```ada

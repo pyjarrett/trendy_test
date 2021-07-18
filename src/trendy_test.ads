@@ -19,12 +19,20 @@ package Trendy_Test is
         function File_Line return Natural;
         function File_Name return Char_Ptr;
         function Subprogram_Name return Char_Ptr;
-        function Value (Str : Char_Ptr) return String renames Interfaces.C.Strings.Value;
-        function Location (File : String; Line : Natural) return String;
-
+        function Image (Str : Char_Ptr) return String renames Interfaces.C.Strings.Value;
         pragma Import (Intrinsic, File_Line, "__builtin_LINE");
         pragma Import (Intrinsic, File_Name, "__builtin_FILE");
         pragma Import (Intrinsic, Subprogram_Name, "__builtin_FUNCTION");
+
+        type Source_Location is record
+            File : Char_Ptr;
+            Line : Natural;
+        end record;
+
+        function Make_Source_Location (File : Char_Ptr  := File_Name;
+                                       Line : Natural := File_Line) return Source_Location;
+
+        function Image (Loc : Source_Location) return String;
     end Locations;
     use Locations;
 
@@ -35,8 +43,8 @@ package Trendy_Test is
     -- Indicates that the current method should be added to the test bank.
     -- Behavior which occurs before a call to Register will be executed on other
     -- test operations such as filtering, and thus should be avoided.
-    procedure Register (Op           : in out Operation;
-                        Name        : String := Value(Subprogram_Name);
+    procedure Register (Op          : in out Operation;
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is abstract;
 
@@ -54,38 +62,35 @@ package Trendy_Test is
 
     overriding
     procedure Register (Self        : in out Gather;
-                        Name        : String := Value(Subprogram_Name);
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True);
 
     overriding
     procedure Register (T           : in out List;
-                        Name        : String := Value(Subprogram_Name);
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True);
 
     overriding
     procedure Register (T           : in out Test;
-                        Name        : String := Value(Subprogram_Name);
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True);
 
     procedure Report_Failure (Op      : in out Operation'Class;
                               Message : String;
-                              File    : String;
-                              Line    : Natural);
+                              Loc     : Source_Location);
     -- Something bad happened.
 
     -- Forcibly fail a test.
     procedure Fail (Op        : in out Operation'Class;
                     Message   : String;
-                    File      : String := Value(File_Name);
-                    Line      : Natural := File_Line);
+                    Loc       : Source_Location := Make_Source_Location);
 
     procedure Assert (Op        : in out Operation'Class;
                       Condition : Boolean;
-                      File      : String := Value(File_Name);
-                      Line      : Natural := File_Line);
+                      Loc       : Source_Location := Make_Source_Location);
     -- A boolean check which must be passed for the test to continue.
 
     generic
@@ -95,8 +100,7 @@ package Trendy_Test is
     procedure Assert_Discrete(Op    : in out Operation'Class;
                               Left  : in T;
                               Right : in T;
-                              File  : String := Value(File_Name);
-                              Line  : Natural := File_Line);
+                              Loc   : Source_Location := Make_Source_Location);
 
     generic
         type T is private;
@@ -104,8 +108,7 @@ package Trendy_Test is
     procedure Assert_EQ(Op    : in out Operation'Class;
                         Left  : T;
                         Right : T;
-                        File  : String := Value(File_Name);
-                        Line  : Natural := File_Line);
+                        Loc   : Source_Location := Make_Source_Location);
 
     ---------------------------------------------------------------------------
     --
@@ -117,7 +120,7 @@ package Trendy_Test is
 
     type Test_Group is array (Positive range <>) of Test_Procedure;
 
-    package Test_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type   => Positive,
+    package Test_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type  => Positive,
                                                                  Element_Type => Test_Procedure);
 
     Test_Failure    : exception;

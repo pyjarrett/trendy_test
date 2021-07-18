@@ -11,11 +11,20 @@ with System.Multiprocessors;
 package body Trendy_Test is
 
     package body Locations is
-        function Location (File : String; Line : Natural) return String is (File & ':' & Line'Image);
+        function Make_Source_Location (File : Char_Ptr := File_Name;
+                                       Line : Natural := File_Line) return Source_Location is
+        begin
+            return (File, Line);
+        end Make_Source_Location;
+
+        function Image (Loc : Source_Location) return String is
+        begin
+            return Image (Loc.File) & ':' & Loc.Line'Image;
+        end Image;
     end Locations;
 
     procedure Register (Op           : in out Operation'Class;
-                        Name         : String := Value(Subprogram_Name);
+                        Name         : String := Image (Subprogram_Name);
                         Disabled     : Boolean := False;
                         Parallelize  : Boolean := True) is
     begin
@@ -25,7 +34,7 @@ package body Trendy_Test is
 
     overriding
     procedure Register (Self        : in out Gather;
-                        Name        : String := Value(Subprogram_Name);
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is
     begin
@@ -46,7 +55,7 @@ package body Trendy_Test is
 
     overriding
     procedure Register (T           : in out List;
-                        Name        : String := Value(Subprogram_Name);
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is
     begin
@@ -56,7 +65,7 @@ package body Trendy_Test is
 
     overriding
     procedure Register (T           : in out Test;
-                        Name        : String := Value(Subprogram_Name);
+                        Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is
     begin
@@ -71,52 +80,47 @@ package body Trendy_Test is
 
     procedure Report_Failure (Op      : in out Operation'Class;
                               Message : String;
-                              File    : String;
-                              Line    : Natural) is
+                              Loc     : Source_Location) is
         Error : constant String := (if Message /= "" then Message else "Condition false");
     begin
         pragma Unreferenced (Op);
-        raise Test_Failure with "Assertion Failed: (" & Error & ") at " & Location (File, Line);
+        raise Test_Failure with "Assertion Failed: (" & Error & ") at " & Image (Loc);
     end Report_Failure;
 
     procedure Fail (Op        : in out Operation'Class;
                     Message   : String;
-                    File      : String := Value(File_Name);
-                    Line      : Natural := File_Line) is
+                    Loc       : Source_Location := Make_Source_Location) is
     begin
-        Op.Report_Failure (Message, File, Line);
+        Op.Report_Failure (Message, Loc);
     end Fail;
 
-    procedure Assert (Op : in out Operation'Class; Condition : Boolean;
-                       File      : String := Value(File_Name);
-                       Line      : Natural := File_Line) is
+    procedure Assert (Op  : in out Operation'Class; Condition : Boolean;
+                      Loc : Source_Location := Make_Source_Location) is
     begin
         if not Condition then
-            Op.Report_Failure("", File, Line);
+            Op.Report_Failure("", Loc);
         end if;
     end Assert;
 
     procedure Assert_Discrete(Op    : in out Operation'Class;
-                               Left  : in T;
-                               Right : in T;
-                               File  : String := Value(File_Name);
-                               Line  : Natural := File_Line) is
+                              Left  : in T;
+                              Right : in T;
+                              Loc   : Source_Location := Make_Source_Location) is
         Message : constant String := Left'Image & ' ' & Operand & ' ' & Right'Image;
     begin
         if not Comparison(Left, Right) then
-            Op.Report_Failure (Message, File, Line);
+            Op.Report_Failure (Message, Loc);
         end if;
     end Assert_Discrete;
 
     procedure Assert_EQ(Op    : in out Operation'Class;
-                         Left  : T;
-                         Right : T;
-                         File  : String := Value(File_Name);
-                         Line  : Natural := File_Line) is
+                        Left  : T;
+                        Right : T;
+                        Loc   : Source_Location := Make_Source_Location) is
         Message : constant String := Image(Left) & " /= " & Image(Right);
     begin
         if Left /= Right then
-            Op.Report_Failure (Message, File, Line);
+            Op.Report_Failure (Message, Loc);
         end if;
     end Assert_EQ;
 

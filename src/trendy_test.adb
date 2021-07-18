@@ -87,16 +87,16 @@ package body Trendy_Test is
         Op.Report_Failure (Message, File, Line);
     end Fail;
 
-    procedure Require (Op : in out Operation'Class; Condition : Boolean;
+    procedure Assert (Op : in out Operation'Class; Condition : Boolean;
                        File      : String := Value(File_Name);
                        Line      : Natural := File_Line) is
     begin
         if not Condition then
             Op.Report_Failure("", File, Line);
         end if;
-    end Require;
+    end Assert;
 
-    procedure Require_Discrete(Op    : in out Operation'Class;
+    procedure Assert_Discrete(Op    : in out Operation'Class;
                                Left  : in T;
                                Right : in T;
                                File  : String := Value(File_Name);
@@ -106,9 +106,9 @@ package body Trendy_Test is
         if not Comparison(Left, Right) then
             Op.Report_Failure (Message, File, Line);
         end if;
-    end Require_Discrete;
+    end Assert_Discrete;
 
-    procedure Require_EQ(Op    : in out Operation'Class;
+    procedure Assert_EQ(Op    : in out Operation'Class;
                          Left  : T;
                          Right : T;
                          File  : String := Value(File_Name);
@@ -118,7 +118,7 @@ package body Trendy_Test is
         if Left /= Right then
             Op.Report_Failure (Message, File, Line);
         end if;
-    end Require_EQ;
+    end Assert_EQ;
 
     function "and" (Left, Right: Test_Result) return Test_Result is
         Either_Failed : constant Boolean := Left = Failed or else Right = Failed;

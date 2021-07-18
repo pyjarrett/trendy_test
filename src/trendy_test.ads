@@ -82,30 +82,30 @@ package Trendy_Test is
                     File      : String := Value(File_Name);
                     Line      : Natural := File_Line);
 
-    procedure Require (Op        : in out Operation'Class;
-                       Condition : Boolean;
-                       File      : String := Value(File_Name);
-                       Line      : Natural := File_Line);
+    procedure Assert (Op        : in out Operation'Class;
+                      Condition : Boolean;
+                      File      : String := Value(File_Name);
+                      Line      : Natural := File_Line);
     -- A boolean check which must be passed for the test to continue.
 
     generic
         type T is (<>);
         Operand : String;
         with function Comparison(Left : T; Right : T) return Boolean;
-    procedure Require_Discrete(Op    : in out Operation'Class;
-                               Left  : in T;
-                               Right : in T;
-                               File  : String := Value(File_Name);
-                               Line  : Natural := File_Line);
+    procedure Assert_Discrete(Op    : in out Operation'Class;
+                              Left  : in T;
+                              Right : in T;
+                              File  : String := Value(File_Name);
+                              Line  : Natural := File_Line);
 
     generic
         type T is private;
         with function Image(Self : T) return String;
-    procedure Require_EQ(Op    : in out Operation'Class;
-                         Left  : T;
-                         Right : T;
-                         File  : String := Value(File_Name);
-                         Line  : Natural := File_Line);
+    procedure Assert_EQ(Op    : in out Operation'Class;
+                        Left  : T;
+                        Right : T;
+                        File  : String := Value(File_Name);
+                        Line  : Natural := File_Line);
 
     ---------------------------------------------------------------------------
     --

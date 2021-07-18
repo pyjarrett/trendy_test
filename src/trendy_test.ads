@@ -5,9 +5,15 @@ with Interfaces.C.Strings;
 
 package Trendy_Test is
 
+    -- Base class for all operations to be done on a test procedure.
+    --
+    -- An operation might not even go further in a test procedure than the
+    -- registration call, such as for operations to gather all of the tests.
+    -- Operations could run the whole procedure, or data collect.
+    --
     type Operation is limited interface;
-    -- Base class for all operations to be done on a test.
 
+    -- Source code reporting using GCC built-ins to avoid dependencies on GNAT libraries.
     package Locations is
         subtype Char_Ptr is Interfaces.C.Strings.chars_ptr;
         function File_Line return Natural;
@@ -25,13 +31,14 @@ package Trendy_Test is
     ---------------------------------------------------------------------------
     --
     ---------------------------------------------------------------------------
+
+    -- Indicates that the current method should be added to the test bank.
+    -- Behavior which occurs before a call to Register will be executed on other
+    -- test operations such as filtering, and thus should be avoided.
     procedure Register (Op           : in out Operation;
                         Name        : String := Value(Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is abstract;
-    -- Indicates that the current method should be added to the test bank.
-    -- Behavior which occurs before a call to Register will be executed on other
-    -- test operations such as filtering, and thus should be avoided.
 
 
     ---------------------------------------------------------------------------

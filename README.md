@@ -42,13 +42,13 @@ package body My_Tests is
     begin
         -- Don't put anything above here you don't want run during listing/other ops.
         T.Register;
-        T.Require (Some_Expression);
+        T.Assert (Some_Expression);
     end Test_Sample;
     
     procedure Test_Is_Disabled (T : in out Trendy_Test.Operation'Class) is
     begin
         T.Register(Disabled => True);  -- Disabled, don't run this test.
-        T.Require (Some_Expression);
+        T.Assert (Some_Expression);
     end Test_Sample;
     
     function All_Tests return Trendy_Test.Test_Group is

@@ -71,7 +71,7 @@ package body Trendy_Test is
     begin
         pragma Unreferenced(Parallelize);
 
-        T.Name := ASU.To_Unbounded_String (Name);
+        T.Name := Ada.Strings.Unbounded.To_Unbounded_String (Name);
 
         if Disabled then
             raise Test_Disabled;
@@ -145,7 +145,7 @@ package body Trendy_Test is
 
         use Ada.Text_IO;
         use Ada.Strings.Unbounded.Text_IO;
-        use type ASU.Unbounded_String;
+        use type Ada.Strings.Unbounded.Unbounded_String;
     begin
         for T of TG loop
             declare
@@ -159,7 +159,6 @@ package body Trendy_Test is
                 when Error : Test_Failure =>
                     Put_Line ("[ FAIL ] " & Instance.Name);
                     Put_Line ("         " & Ada.Exceptions.Exception_Message (Error));
-                    -- Put_Line (Ada.Exceptions.Exception_Information (Error));
                     Fails := Fails + 1;
             end;
         end loop;
@@ -190,7 +189,7 @@ package body Trendy_Test is
     package Test_Report_Vectors_Sort is new Test_Report_Vectors.Generic_Sorting("<" => "<");
 
     -- Produces a pseudo-random order of tests.
-    function Shuffle (V : Test_Vectors.Vector) return Test_Vectors.Vector is
+    function Shuffle (V : Test_Procedure_Vectors.Vector) return Test_Procedure_Vectors.Vector is
         package Positive_Random is new Ada.Numerics.Discrete_Random(Result_Subtype => Positive);
         Generator          : Positive_Random.Generator;
         Shuffle_Runs       : constant Natural := 5;
@@ -203,7 +202,7 @@ package body Trendy_Test is
             return V;
         end if;
 
-        return Result : Test_Vectors.Vector := V.Copy do
+        return Result : Test_Procedure_Vectors.Vector := V.Copy do
             for Iteration in 1 .. Shuffle_Iterations loop
                 I := Positive_Random.Random(Generator, 1, Positive(V.Length));
                 J := Positive_Random.Random(Generator, 1, Positive(V.Length));
@@ -212,6 +211,7 @@ package body Trendy_Test is
         end return;
     end Shuffle;
 
+    -- Accepts test results from parallelized test tasks.
     protected type Test_Results is
         procedure Add(T : Test_Report);
         function Get_Results return Test_Report_Vectors.Vector;
@@ -238,12 +238,12 @@ package body Trendy_Test is
         Total     : Natural := 0;
         Results   : Test_Results;
         Tests     : Test_Queues.Queue;
-        Parallel_Tests : Test_Vectors.Vector;
-        Sequential_Tests : Test_Vectors.Vector;
+        Parallel_Tests : Test_Procedure_Vectors.Vector;
+        Sequential_Tests : Test_Procedure_Vectors.Vector;
 
         use Ada.Text_IO;
         use Ada.Strings.Unbounded.Text_IO;
-        use type ASU.Unbounded_String;
+        use type Ada.Strings.Unbounded.Unbounded_String;
 
         task type Parallel_Test_Task is end Parallel_Test_Task;
         task body Parallel_Test_Task is

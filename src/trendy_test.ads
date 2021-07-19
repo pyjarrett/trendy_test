@@ -136,28 +136,26 @@ package Trendy_Test is
 
 private
 
-    package Test_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type  => Positive,
-                                                                 Element_Type => Test_Procedure);
-
-    function Run (TG : in Test_Group) return Test_Result;
+    package Test_Procedure_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type   => Positive,
+                                                                            Element_Type => Test_Procedure);
 
     package Test_Group_List is new Ada.Containers.Indefinite_Vectors(Index_Type   => Positive,
                                                                      Element_Type => Test_Group);
 
-    package ASU renames Ada.Strings.Unbounded;
+    function Run (TG : in Test_Group) return Test_Result;
 
     type Gather is new Operation with record
         -- Simplify the Register procedure call inside tests, by recording the
         -- "current test" being registered.
         Current_Test     : Test_Procedure;
-        Sequential_Tests : Test_Vectors.Vector;
-        Parallel_Tests   : Test_Vectors.Vector;
+        Sequential_Tests : Test_Procedure_Vectors.Vector;
+        Parallel_Tests   : Test_Procedure_Vectors.Vector;
     end record;
 
     type List is new Operation with null record;
 
     type Test is new Operation with record
-        Name : ASU.Unbounded_String;
+        Name : Ada.Strings.Unbounded.Unbounded_String;
     end record;
 
     overriding

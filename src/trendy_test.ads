@@ -1,4 +1,5 @@
 with Ada.Containers.Indefinite_Vectors;
+with Ada.Execution_Time;
 with Ada.Strings.Unbounded;
 with Interfaces.C.Strings;
 
@@ -119,11 +120,10 @@ package Trendy_Test is
     function "and" (Left, Right: Test_Result) return Test_Result;
 
     type Test_Report is record
-        Name   : Ada.Strings.Unbounded.Unbounded_String;
-        Status : Test_Result;
-        Failure : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
-        -- - Number of assertions checked
-        -- - Time duration of the test
+        Name                 : Ada.Strings.Unbounded.Unbounded_String;
+        Status               : Test_Result;
+        Start_Time, End_Time : Ada.Execution_Time.CPU_Time;
+        Failure              : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
     end record;
 
     -- Adds another batch of tests to the list to be processed.

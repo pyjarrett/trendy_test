@@ -3,6 +3,7 @@ with Ada.Containers.Unbounded_Synchronized_Queues;
 with Ada.Containers.Vectors;
 with Ada.Exceptions;
 with Ada.Numerics.Discrete_Random;
+with Ada.Real_Time;
 with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
 
@@ -258,15 +259,18 @@ package body Trendy_Test is
                 end select;
 
                 declare
-                    Instance : Test;
+                    Instance   : Test;
+                    Start_Time : constant Ada.Execution_Time.CPU_Time := Ada.Execution_Time.Clock;
+                    End_Time   : Ada.Execution_Time.CPU_Time;
                 begin
                     Next_Test.all (Instance);
-                    Results.Add((Instance.Name, Passed, others => <>));
+                    End_Time := Ada.Execution_Time.Clock;
+                    Results.Add((Instance.Name, Passed, Start_Time, End_Time, others => <>));
                 exception
                     when Test_Disabled =>
-                        Results.Add ((Instance.Name, Skipped, others => <>));
+                        Results.Add ((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
                     when Error : others =>
-                        Results.Add ((Instance.Name, Failed,
+                        Results.Add ((Instance.Name, Failed, Start_Time, End_Time,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));
                 end;
@@ -316,15 +320,18 @@ package body Trendy_Test is
         -----------------------------------------------------------------------
         for T of Sequential_Tests loop
             declare
-                Instance : Test;
+                Instance   : Test;
+                Start_Time : constant Ada.Execution_Time.CPU_Time := Ada.Execution_Time.Clock;
+                End_Time   : Ada.Execution_Time.CPU_Time;
             begin
                 T.all (Instance);
-                Results.Add(Test_Report'(Instance.Name, Passed, others => <>));
+                End_Time := Ada.Execution_Time.Clock;
+                Results.Add(Test_Report'(Instance.Name, Passed, Start_Time, End_Time, others => <>));
             exception
                 when Test_Disabled =>
-                    Results.Add((Instance.Name, Skipped, others => <>));
+                    Results.Add((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
                 when Error : Test_Failure =>
-                    Results.Add(Test_Report'(Instance.Name, Failed,
+                    Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));
             end;
@@ -335,19 +342,31 @@ package body Trendy_Test is
         -----------------------------------------------------------------------
         declare
             Final_Results : Test_Report_Vectors.Vector := Results.Get_Results;
+            use all type Ada.Execution_Time.CPU_Time;
         begin
             Test_Report_Vectors_Sort.Sort(Final_Results);
 
             for R of Final_Results loop
                 case R.Status is
                 when Passed => Passes := Passes + 1;
-                    Put_Line ("[ PASS ] " & R.Name);
+                    Put ("[ PASS ] " & R.Name);
+                    Set_Col (70);
                 when Failed => Fails := Fails + 1;
-                    Put_Line ("[ FAIL ] " & R.Name);
-                    Put_Line ("         " & R.Failure);
+                    Put ("[ FAIL ] " & R.Name);
                 when Skipped => null;
-                    Put_Line ("[ SKIP ] " & R.Name);
+                    Put ("[ SKIP ] " & R.Name);
                 end case;
+                Set_Col (80);
+
+                declare
+                    DT : constant Duration := Ada.Real_Time.To_Duration(R.End_Time - R.Start_Time);
+                begin
+                    Put_Line (DT'Image);
+                end;
+
+                if R.Status = Failed then
+                    Put_Line ("         " & R.Failure);
+                end if;
             end loop;
 
             Total := Fails + Passes;

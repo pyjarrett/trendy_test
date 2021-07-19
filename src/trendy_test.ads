@@ -1,8 +1,15 @@
 with Ada.Containers.Indefinite_Vectors;
 with Ada.Strings.Unbounded;
-
 with Interfaces.C.Strings;
 
+-- A super simple testing library for Ada.  This aims for minimum registration
+-- and maximum ease of use.  "Testing in as few lines as possible."
+--
+-- There are no `Set_Up` or `Tear_Down` routines, if you want that behavior,
+-- you can write it yourself in the test.
+--
+-- There's magic going on behind the scenes here, but don't worry about it.  You
+-- really don't want to know the sausage is made.
 package Trendy_Test is
 
     -- Base class for all operations to be done on a test procedure.
@@ -24,12 +31,16 @@ package Trendy_Test is
         pragma Import (Intrinsic, File_Name, "__builtin_FILE");
         pragma Import (Intrinsic, Subprogram_Name, "__builtin_FUNCTION");
 
+        -- Prevent from having to lug around files and lines separately by
+        -- simply making them part of the same group.
         type Source_Location is record
             File : Char_Ptr;
             Line : Natural;
         end record;
 
-        function Make_Source_Location (File : Char_Ptr  := File_Name;
+        -- Call with no parameters to make a file/line location at the current
+        -- in the file.
+        function Make_Source_Location (File : Char_Ptr := File_Name;
                                        Line : Natural := File_Line) return Source_Location;
 
         function Image (Loc : Source_Location) return String;
@@ -48,40 +59,13 @@ package Trendy_Test is
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is abstract;
 
-
-    ---------------------------------------------------------------------------
-    -- Test Operations
-    ---------------------------------------------------------------------------
-
-    type Gather is new Operation with private;
-
-    type List is new Operation with private;
-
-    type Test is new Operation with private;
-    -- Runs tests on test procedures.
-
-    overriding
-    procedure Register (Self        : in out Gather;
-                        Name        : String := Image (Subprogram_Name);
-                        Disabled    : Boolean := False;
-                        Parallelize : Boolean := True);
-
-    overriding
-    procedure Register (T           : in out List;
-                        Name        : String := Image (Subprogram_Name);
-                        Disabled    : Boolean := False;
-                        Parallelize : Boolean := True);
-
-    overriding
-    procedure Register (T           : in out Test;
-                        Name        : String := Image (Subprogram_Name);
-                        Disabled    : Boolean := False;
-                        Parallelize : Boolean := True);
-
+    -- A check failed, so the operation needs to determine what to do.
+    --
+    -- In a test operation, this might raise an exception to break out of the
+    -- test or stopping with breakpoint.
     procedure Report_Failure (Op      : in out Operation'Class;
                               Message : String;
                               Loc     : Source_Location);
-    -- Something bad happened.
 
     -- Forcibly fail a test.
     procedure Fail (Op        : in out Operation'Class;
@@ -95,6 +79,8 @@ package Trendy_Test is
 
     generic
         type T is (<>);
+
+        -- How this operand should be reported.
         Operand : String;
         with function Comparison(Left : T; Right : T) return Boolean;
     procedure Assert_Discrete(Op    : in out Operation'Class;
@@ -114,18 +100,20 @@ package Trendy_Test is
     --
     ---------------------------------------------------------------------------
 
-    type Test_Procedure is access procedure (Op : in out Operation'Class);
     -- Test procedures might be called with one of many test operations.  This could
     -- include gathering test names for filtering, or running the tests themselves.
+    type Test_Procedure is access procedure (Op : in out Operation'Class);
 
     type Test_Group is array (Positive range <>) of Test_Procedure;
 
-    package Test_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type  => Positive,
-                                                                 Element_Type => Test_Procedure);
-
+    -- Used by Test to indicate a failure.
     Test_Failure    : exception;
+
+    -- Used by Test to bail out silently when a test is disabled.
     Test_Disabled   : exception;
-    Test_Registered : exception; -- Used by Gather for an early bail-out of test functions.
+
+    -- Used by Gather for an early bail-out of test functions.
+    Test_Registered : exception;
 
     type Test_Result is (Passed, Failed, Skipped);
     function "and" (Left, Right: Test_Result) return Test_Result;
@@ -140,19 +128,16 @@ package Trendy_Test is
         -- - Time duration of the test
     end record;
 
-    function "<"(Left, Right : Test_Report) return Boolean;
-
+    -- Adds another batch of tests to the list to be processed.
     procedure Register (TG : in Test_Group);
 
+    -- Runs all currently registered tests.
     function Run return Test_Result;
 
-    --  with System.Machine_Code;
-    --  procedure Breakpoint is
-    --  begin
-    --      System.Machine_Code.Asm("int3", Volatile => True);
-    --  end Breakpoint;
-
 private
+
+    package Test_Vectors is new Ada.Containers.Indefinite_Vectors(Index_Type  => Positive,
+                                                                 Element_Type => Test_Procedure);
 
     function Run (TG : in Test_Group) return Test_Result;
 
@@ -174,6 +159,24 @@ private
     type Test is new Operation with record
         Name : ASU.Unbounded_String;
     end record;
+
+    overriding
+    procedure Register (Self        : in out Gather;
+                        Name        : String := Image (Subprogram_Name);
+                        Disabled    : Boolean := False;
+                        Parallelize : Boolean := True);
+
+    overriding
+    procedure Register (T           : in out List;
+                        Name        : String := Image (Subprogram_Name);
+                        Disabled    : Boolean := False;
+                        Parallelize : Boolean := True);
+
+    overriding
+    procedure Register (T           : in out Test;
+                        Name        : String := Image (Subprogram_Name);
+                        Disabled    : Boolean := False;
+                        Parallelize : Boolean := True);
 
     All_Test_Groups : Test_Group_List.Vector;
 

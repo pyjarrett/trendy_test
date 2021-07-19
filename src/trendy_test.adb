@@ -131,11 +131,6 @@ package body Trendy_Test is
         return (if Either_Failed then Failed else (if Both_Skipped then Skipped else Passed));
     end "and";
 
-    function "<"(Left, Right : Test_Report) return Boolean is
-        use Ada.Strings.Unbounded;
-    begin
-        return Left.Name < Right.Name;
-    end "<";
 
     procedure Register (TG : in Test_Group) is
     begin
@@ -179,6 +174,12 @@ package body Trendy_Test is
         end if;
     end Run;
 
+    function "<"(Left, Right : Test_Report) return Boolean is
+        use Ada.Strings.Unbounded;
+    begin
+        return Left.Name < Right.Name;
+    end "<";
+
     -- An easy algorithm for parallelism is to throw all of our parallel tests into a huge
     -- queue and then have every task pick one up as needed, writing our results to a protected
     -- object.
@@ -188,6 +189,7 @@ package body Trendy_Test is
     package Test_Report_Vectors is new Ada.Containers.Vectors (Index_Type => Positive, Element_Type => Test_Report);
     package Test_Report_Vectors_Sort is new Test_Report_Vectors.Generic_Sorting("<" => "<");
 
+    -- Produces a pseudo-random order of tests.
     function Shuffle (V : Test_Vectors.Vector) return Test_Vectors.Vector is
         package Positive_Random is new Ada.Numerics.Discrete_Random(Result_Subtype => Positive);
         Generator          : Positive_Random.Generator;

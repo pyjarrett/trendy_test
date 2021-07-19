@@ -261,12 +261,12 @@ package body Trendy_Test is
                     Instance : Test;
                 begin
                     Next_Test.all (Instance);
-                    Results.Add((Instance.Name, Passed, 0, 0, others => <>));
+                    Results.Add((Instance.Name, Passed, others => <>));
                 exception
                     when Test_Disabled =>
-                        Results.Add ((Instance.Name, Skipped, 0, 0, others => <>));
+                        Results.Add ((Instance.Name, Skipped, others => <>));
                     when Error : others =>
-                        Results.Add ((Instance.Name, Failed, 0, 0,
+                        Results.Add ((Instance.Name, Failed,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));
                 end;
@@ -319,12 +319,12 @@ package body Trendy_Test is
                 Instance : Test;
             begin
                 T.all (Instance);
-                Results.Add(Test_Report'(Instance.Name, Passed, 0, 0, others => <>));
+                Results.Add(Test_Report'(Instance.Name, Passed, others => <>));
             exception
                 when Test_Disabled =>
-                    Results.Add((Instance.Name, Skipped, 0, 0, others => <>));
+                    Results.Add((Instance.Name, Skipped, others => <>));
                 when Error : Test_Failure =>
-                    Results.Add(Test_Report'(Instance.Name, Failed, 0, 0,
+                    Results.Add(Test_Report'(Instance.Name, Failed,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));
             end;

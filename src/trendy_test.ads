@@ -121,8 +121,6 @@ package Trendy_Test is
     type Test_Report is record
         Name   : Ada.Strings.Unbounded.Unbounded_String;
         Status : Test_Result;
-        Passed_Assertions : Natural := 0;
-        Failed_Assertions : Natural := 0;
         Failure : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
         -- - Number of assertions checked
         -- - Time duration of the test

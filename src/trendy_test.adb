@@ -3,7 +3,6 @@ with Ada.Containers.Unbounded_Synchronized_Queues;
 with Ada.Containers.Vectors;
 with Ada.Exceptions;
 with Ada.Numerics.Discrete_Random;
-with Ada.Real_Time;
 with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
 
@@ -260,11 +259,11 @@ package body Trendy_Test is
 
                 declare
                     Instance   : Test;
-                    Start_Time : constant Ada.Execution_Time.CPU_Time := Ada.Execution_Time.Clock;
-                    End_Time   : Ada.Execution_Time.CPU_Time;
+                    Start_Time : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+                    End_Time   : Ada.Calendar.Time;
                 begin
                     Next_Test.all (Instance);
-                    End_Time := Ada.Execution_Time.Clock;
+                    End_Time := Ada.Calendar.Clock;
                     Results.Add((Instance.Name, Passed, Start_Time, End_Time, others => <>));
                 exception
                     when Test_Disabled =>
@@ -321,11 +320,11 @@ package body Trendy_Test is
         for T of Sequential_Tests loop
             declare
                 Instance   : Test;
-                Start_Time : constant Ada.Execution_Time.CPU_Time := Ada.Execution_Time.Clock;
-                End_Time   : Ada.Execution_Time.CPU_Time;
+                Start_Time : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+                End_Time   : Ada.Calendar.Time;
             begin
                 T.all (Instance);
-                End_Time := Ada.Execution_Time.Clock;
+                End_Time := Ada.Calendar.Clock;
                 Results.Add(Test_Report'(Instance.Name, Passed, Start_Time, End_Time, others => <>));
             exception
                 when Test_Disabled =>
@@ -342,7 +341,7 @@ package body Trendy_Test is
         -----------------------------------------------------------------------
         declare
             Final_Results : Test_Report_Vectors.Vector := Results.Get_Results;
-            use all type Ada.Execution_Time.CPU_Time;
+            use all type Ada.Calendar.Time;
         begin
             Test_Report_Vectors_Sort.Sort(Final_Results);
 
@@ -350,7 +349,6 @@ package body Trendy_Test is
                 case R.Status is
                 when Passed => Passes := Passes + 1;
                     Put ("[ PASS ] " & R.Name);
-                    Set_Col (70);
                 when Failed => Fails := Fails + 1;
                     Put ("[ FAIL ] " & R.Name);
                 when Skipped => null;
@@ -359,7 +357,7 @@ package body Trendy_Test is
                 Set_Col (80);
 
                 declare
-                    DT : constant Duration := Ada.Real_Time.To_Duration(R.End_Time - R.Start_Time);
+                    DT : constant Duration := R.End_Time - R.Start_Time;
                 begin
                     Put_Line (DT'Image);
                 end;

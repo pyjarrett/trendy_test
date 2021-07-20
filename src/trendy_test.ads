@@ -1,5 +1,5 @@
+with Ada.Calendar;
 with Ada.Containers.Indefinite_Vectors;
-with Ada.Execution_Time;
 with Ada.Strings.Unbounded;
 with Interfaces.C.Strings;
 
@@ -122,7 +122,7 @@ package Trendy_Test is
     type Test_Report is record
         Name                 : Ada.Strings.Unbounded.Unbounded_String;
         Status               : Test_Result;
-        Start_Time, End_Time : Ada.Execution_Time.CPU_Time;
+        Start_Time, End_Time : Ada.Calendar.Time;
         Failure              : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
     end record;
 

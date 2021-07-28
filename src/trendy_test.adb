@@ -269,6 +269,7 @@ package body Trendy_Test is
                     when Test_Disabled =>
                         Results.Add ((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
                     when Error : others =>
+                        End_Time := Ada.Calendar.Clock;
                         Results.Add ((Instance.Name, Failed, Start_Time, End_Time,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));
@@ -330,6 +331,7 @@ package body Trendy_Test is
                 when Test_Disabled =>
                     Results.Add((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
                 when Error : Test_Failure =>
+                    End_Time := Ada.Calendar.Clock;
                     Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
                                      Failure => Ada.Strings.Unbounded.To_Unbounded_String(
                                          Ada.Exceptions.Exception_Message (Error))));

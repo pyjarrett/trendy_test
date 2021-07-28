@@ -8,6 +8,8 @@ with Ada.Text_IO;
 
 with System.Multiprocessors;
 
+with GNAT.Traceback.Symbolic;
+
 package body Trendy_Test is
 
     package body Locations is
@@ -231,6 +233,30 @@ package body Trendy_Test is
         end Get_Results;
     end Test_Results;
 
+    procedure Run_Test (Test_Proc : in Test_Procedure; Results : in out Test_Results) is
+        Instance   : Test;
+        Start_Time : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+        End_Time   : Ada.Calendar.Time;
+    begin
+        Test_Proc.all (Instance);
+        End_Time := Ada.Calendar.Clock;
+        Results.Add(Test_Report'(Instance.Name, Passed, Start_Time, End_Time, others => <>));
+    exception
+        when Test_Disabled =>
+            End_Time := Ada.Calendar.Clock;
+            Results.Add((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
+        when Error : Test_Failure =>
+            End_Time := Ada.Calendar.Clock;
+            Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
+                        Failure => Ada.Strings.Unbounded.To_Unbounded_String(
+                            Ada.Exceptions.Exception_Message (Error))));
+        when Error : others =>
+            End_Time := Ada.Calendar.Clock;
+            Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
+                        Failure => Ada.Strings.Unbounded.To_Unbounded_String(
+                            Ada.Exceptions.Exception_Message (Error))));
+    end Run_Test;
+
     function Run return Test_Result is
         Gather_Op : Gather;
         Passes    : Natural := 0;
@@ -257,24 +283,13 @@ package body Trendy_Test is
                     exit;
                 end select;
 
-                declare
-                    Instance   : Test;
-                    Start_Time : constant Ada.Calendar.Time := Ada.Calendar.Clock;
-                    End_Time   : Ada.Calendar.Time;
-                begin
-                    Next_Test.all (Instance);
-                    End_Time := Ada.Calendar.Clock;
-                    Results.Add((Instance.Name, Passed, Start_Time, End_Time, others => <>));
-                exception
-                    when Test_Disabled =>
-                        Results.Add ((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
-                    when Error : others =>
-                        End_Time := Ada.Calendar.Clock;
-                        Results.Add ((Instance.Name, Failed, Start_Time, End_Time,
-                                     Failure => Ada.Strings.Unbounded.To_Unbounded_String(
-                                         Ada.Exceptions.Exception_Message (Error))));
-                end;
+                Run_Test (Next_Test, Results);
             end loop;
+
+            exception
+                when Err : others =>
+                    Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Information (Err));
+                    Ada.Text_IO.Put_Line ("Exception traceback: " & GNAT.Traceback.Symbolic.Symbolic_Traceback (Err));
         end Parallel_Test_Task;
     begin
         -- Gather all of the possible tests, filtering by only those tests which
@@ -319,23 +334,7 @@ package body Trendy_Test is
         -- Sequential Tests
         -----------------------------------------------------------------------
         for T of Sequential_Tests loop
-            declare
-                Instance   : Test;
-                Start_Time : constant Ada.Calendar.Time := Ada.Calendar.Clock;
-                End_Time   : Ada.Calendar.Time;
-            begin
-                T.all (Instance);
-                End_Time := Ada.Calendar.Clock;
-                Results.Add(Test_Report'(Instance.Name, Passed, Start_Time, End_Time, others => <>));
-            exception
-                when Test_Disabled =>
-                    Results.Add((Instance.Name, Skipped, Start_Time, End_Time, others => <>));
-                when Error : Test_Failure =>
-                    End_Time := Ada.Calendar.Clock;
-                    Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
-                                     Failure => Ada.Strings.Unbounded.To_Unbounded_String(
-                                         Ada.Exceptions.Exception_Message (Error))));
-            end;
+            Run_Test (T, Results);
         end loop;
 
         -----------------------------------------------------------------------

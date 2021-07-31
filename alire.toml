@@ -10,7 +10,7 @@ tags = ["test", "unit-test", "unit"]
 
 project-files = ["trendy_test.gpr"]
 
-long_description = '''
+long-description = '''
 # trendy_test
 
 Minimum Effort Ada Unit Testing Library

@@ -249,12 +249,14 @@ package body Trendy_Test is
             End_Time := Ada.Calendar.Clock;
             Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
                         Failure => Ada.Strings.Unbounded.To_Unbounded_String(
-                            Ada.Exceptions.Exception_Message (Error))));
+                            Ada.Exceptions.Exception_Message (Error) &
+                           GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
         when Error : others =>
             End_Time := Ada.Calendar.Clock;
             Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
                         Failure => Ada.Strings.Unbounded.To_Unbounded_String(
-                            Ada.Exceptions.Exception_Message (Error))));
+                            Ada.Exceptions.Exception_Message (Error) &
+                           GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
     end Run_Test;
 
     function Run return Test_Result is
@@ -285,11 +287,6 @@ package body Trendy_Test is
 
                 Run_Test (Next_Test, Results);
             end loop;
-
-            exception
-                when Err : others =>
-                    Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Information (Err));
-                    Ada.Text_IO.Put_Line ("Exception traceback: " & GNAT.Traceback.Symbolic.Symbolic_Traceback (Err));
         end Parallel_Test_Task;
     begin
         -- Gather all of the possible tests, filtering by only those tests which

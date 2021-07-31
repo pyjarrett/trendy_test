@@ -1,6 +1,5 @@
 with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Synchronized_Queues;
-with Ada.Containers.Vectors;
 with Ada.Exceptions;
 with Ada.Numerics.Discrete_Random;
 with Ada.Strings.Unbounded.Text_IO;
@@ -187,9 +186,6 @@ package body Trendy_Test is
     package Test_Queue_Interfaces is new Ada.Containers.Synchronized_Queue_Interfaces (Element_Type => Test_Procedure);
     package Test_Queues is new Ada.Containers.Unbounded_Synchronized_Queues (Queue_Interfaces => Test_Queue_Interfaces);
 
-    package Test_Report_Vectors is new Ada.Containers.Vectors (Index_Type => Positive, Element_Type => Test_Report);
-    package Test_Report_Vectors_Sort is new Test_Report_Vectors.Generic_Sorting("<" => "<");
-
     -- Produces a pseudo-random order of tests.
     function Shuffle (V : Test_Procedure_Vectors.Vector) return Test_Procedure_Vectors.Vector is
         package Positive_Random is new Ada.Numerics.Discrete_Random(Result_Subtype => Positive);
@@ -259,19 +255,12 @@ package body Trendy_Test is
                            GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
     end Run_Test;
 
-    function Run return Test_Result is
+    function Run return Test_Report_Vectors.Vector is
         Gather_Op : Gather;
-        Passes    : Natural := 0;
-        Fails     : Natural := 0;
-        Total     : Natural := 0;
         Results   : Test_Results;
         Tests     : Test_Queues.Queue;
         Parallel_Tests : Test_Procedure_Vectors.Vector;
         Sequential_Tests : Test_Procedure_Vectors.Vector;
-
-        use Ada.Text_IO;
-        use Ada.Strings.Unbounded.Text_IO;
-        use type Ada.Strings.Unbounded.Unbounded_String;
 
         task type Parallel_Test_Task is end Parallel_Test_Task;
         task body Parallel_Test_Task is
@@ -334,45 +323,6 @@ package body Trendy_Test is
             Run_Test (T, Results);
         end loop;
 
-        -----------------------------------------------------------------------
-        -- Reporting
-        -----------------------------------------------------------------------
-        declare
-            Final_Results : Test_Report_Vectors.Vector := Results.Get_Results;
-            use all type Ada.Calendar.Time;
-        begin
-            Test_Report_Vectors_Sort.Sort(Final_Results);
-
-            for R of Final_Results loop
-                case R.Status is
-                when Passed => Passes := Passes + 1;
-                    Put ("[ PASS ] " & R.Name);
-                when Failed => Fails := Fails + 1;
-                    Put ("[ FAIL ] " & R.Name);
-                when Skipped => null;
-                    Put ("[ SKIP ] " & R.Name);
-                end case;
-                Set_Col (80);
-
-                declare
-                    DT : constant Duration := R.End_Time - R.Start_Time;
-                begin
-                    Put_Line (DT'Image);
-                end;
-
-                if R.Status = Failed then
-                    Put_Line ("         " & R.Failure);
-                end if;
-            end loop;
-
-            Total := Fails + Passes;
-            Put_Line ("Results: Passed: " & Passes'Image & " / " & Total'Image);
-            New_Line;
-            if Fails > 0 then
-                return Failed;
-            else
-                return Passed;
-            end if;
-        end;
+        return Results.Get_Results;
     end Run;
 end Trendy_Test;

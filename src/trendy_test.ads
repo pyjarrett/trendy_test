@@ -1,5 +1,6 @@
 with Ada.Calendar;
 with Ada.Containers.Indefinite_Vectors;
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded;
 with Interfaces.C.Strings;
 
@@ -126,11 +127,16 @@ package Trendy_Test is
         Failure              : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
     end record;
 
+    function "<"(Left, Right : Test_Report) return Boolean;
+
+    package Test_Report_Vectors is new Ada.Containers.Vectors (Index_Type => Positive, Element_Type => Test_Report);
+    package Test_Report_Vectors_Sort is new Test_Report_Vectors.Generic_Sorting("<" => "<");
+
     -- Adds another batch of tests to the list to be processed.
     procedure Register (TG : in Test_Group);
 
     -- Runs all currently registered tests.
-    function Run return Test_Result;
+    function Run return Test_Report_Vectors.Vector;
 
 private
 

@@ -188,7 +188,8 @@ package body Trendy_Test is
 
     -- Produces a pseudo-random order of tests.
     function Shuffle (V : Test_Procedure_Vectors.Vector) return Test_Procedure_Vectors.Vector is
-        package Positive_Random is new Ada.Numerics.Discrete_Random(Result_Subtype => Positive);
+        subtype Random_Range is Positive range 1 .. Positive(V.Length);
+        package Positive_Random is new Ada.Numerics.Discrete_Random(Result_Subtype => Random_Range);
         Generator          : Positive_Random.Generator;
         Shuffle_Runs       : constant Natural := 5;
         Shuffle_Iterations : constant Natural := Natural(V.Length) * Shuffle_Runs;
@@ -202,8 +203,8 @@ package body Trendy_Test is
 
         return Result : Test_Procedure_Vectors.Vector := V.Copy do
             for Iteration in 1 .. Shuffle_Iterations loop
-                I := Positive_Random.Random(Generator, 1, Positive(V.Length));
-                J := Positive_Random.Random(Generator, 1, Positive(V.Length));
+                I := Positive_Random.Random(Generator);
+                J := Positive_Random.Random(Generator);
                 Result.Swap(I, J);
             end loop;
         end return;

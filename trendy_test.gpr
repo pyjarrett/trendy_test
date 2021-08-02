@@ -20,7 +20,7 @@ project Trendy_Test is
    Contracts_Checks : Enabled_Kind := External ("TRENDY_TEST_CONTRACTS", "enabled");
 
    type Build_Kind is ("debug", "optimize");
-   Build_Mode : Build_Kind := External ("TRENDY_TEST_BUILD_MODE", "debug");
+   Build_Mode : Build_Kind := External ("TRENDY_TEST_BUILD_MODE", "optimize");
 
    Compile_Checks_Switches := ();
    case Compile_Checks is

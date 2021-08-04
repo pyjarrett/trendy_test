@@ -14,10 +14,10 @@ project Trendy_Test is
    for Library_Kind use Library_Type;
 
    type Enabled_Kind is ("enabled", "disabled");
-   Compile_Checks : Enabled_Kind := External ("TRENDY_TEST_COMPILE_CHECKS", "enabled");
-   Runtime_Checks : Enabled_Kind := External ("TRENDY_TEST_RUNTIME_CHECKS", "enabled");
-   Style_Checks : Enabled_Kind := External ("TRENDY_TEST_STYLE_CHECKS", "enabled");
-   Contracts_Checks : Enabled_Kind := External ("TRENDY_TEST_CONTRACTS", "enabled");
+   Compile_Checks : Enabled_Kind := External ("TRENDY_TEST_COMPILE_CHECKS", "disabled");
+   Runtime_Checks : Enabled_Kind := External ("TRENDY_TEST_RUNTIME_CHECKS", "disabled");
+   Style_Checks : Enabled_Kind := External ("TRENDY_TEST_STYLE_CHECKS", "disabled");
+   Contracts_Checks : Enabled_Kind := External ("TRENDY_TEST_CONTRACTS", "disabled");
 
    type Build_Kind is ("debug", "optimize");
    Build_Mode : Build_Kind := External ("TRENDY_TEST_BUILD_MODE", "optimize");

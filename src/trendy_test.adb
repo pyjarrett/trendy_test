@@ -187,7 +187,9 @@ package body Trendy_Test is
     package Test_Queues is new Ada.Containers.Unbounded_Synchronized_Queues (Queue_Interfaces => Test_Queue_Interfaces);
 
     -- Produces a pseudo-random order of tests.
-    function Shuffle (V : Test_Procedure_Vectors.Vector) return Test_Procedure_Vectors.Vector is
+    function Shuffle (V : Test_Procedure_Vectors.Vector) return Test_Procedure_Vectors.Vector
+        with Pre => not V.Is_Empty
+    is
         subtype Random_Range is Positive range 1 .. Positive(V.Length);
         package Positive_Random is new Ada.Numerics.Discrete_Random(Result_Subtype => Random_Range);
         Generator          : Positive_Random.Generator;
@@ -297,8 +299,13 @@ package body Trendy_Test is
 
         -- Tests shouldn't produce different results run in different orders.
         -- Shuffle the tests to check this, and report the random seed used.
-        Sequential_Tests := Shuffle(Gather_Op.Sequential_Tests);
-        Parallel_Tests := Shuffle(Gather_Op.Parallel_Tests);
+        if not Gather_Op.Sequential_Tests.Is_Empty then
+            Sequential_Tests := Shuffle(Gather_Op.Sequential_Tests);
+        end if;
+
+        if not Gather_Op.Parallel_Tests.Is_Empty then
+            Parallel_Tests := Shuffle(Gather_Op.Parallel_Tests);
+        end if;
 
         -----------------------------------------------------------------------
         -- Parallel tests.

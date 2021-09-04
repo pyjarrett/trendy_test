@@ -132,6 +132,12 @@ package Trendy_Test is
     package Test_Report_Vectors is new Ada.Containers.Vectors (Index_Type => Positive, Element_Type => Test_Report);
     package Test_Report_Vectors_Sort is new Test_Report_Vectors.Generic_Sorting("<" => "<");
 
+    -- A test procedure was part of a test group, but never called Register.
+    Unregistered_Test : exception;
+
+    -- A test called "Register" multiple times.
+    Multiply_Registered_Test : exception;
+
     -- Adds another batch of tests to the list to be processed.
     procedure Register (TG : in Test_Group);
 
@@ -152,9 +158,14 @@ private
         -- Simplify the Register procedure call inside tests, by recording the
         -- "current test" being registered.
         Current_Test     : Test_Procedure;
+
+        -- The name of the last registered test.
+        Current_Name     : Ada.Strings.Unbounded.Unbounded_String;
         Sequential_Tests : Test_Procedure_Vectors.Vector;
         Parallel_Tests   : Test_Procedure_Vectors.Vector;
     end record;
+
+    function Num_Total_Tests (Self : Gather) return Integer;
 
     type List is new Operation with null record;
 

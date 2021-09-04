@@ -33,22 +33,32 @@ package body Trendy_Test is
     end Register;
     pragma Unreferenced (Register);
 
+    function Num_Total_Tests (Self : Gather) return Integer is
+        use all type Ada.Containers.Count_Type;
+    begin
+        return Integer(Self.Parallel_Tests.Length + Self.Sequential_Tests.Length);
+    end Num_Total_Tests;
+
     overriding
     procedure Register (Self        : in out Gather;
                         Name        : String := Image (Subprogram_Name);
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is
+        package ASU renames Ada.Strings.Unbounded;
     begin
         -- TODO: Test filter to go here.
         if Disabled then
             raise Test_Registered;
-            return;
         end if;
+        
+        Self.Current_Name := ASU.To_Unbounded_String(Name);
 
         if Parallelize then
             Self.Parallel_Tests.Append(Self.Current_Test);
+            Ada.Text_IO.Put_Line ("// PARALLEL // " & ASU.To_String(Self.Current_Name));
         else
             Self.Sequential_Tests.Append(Self.Current_Test);
+            Ada.Text_IO.Put_Line ("--SEQUENTIAL-- " & ASU.To_String(Self.Current_Name));
         end if;
 
         raise Test_Registered;
@@ -287,9 +297,19 @@ package body Trendy_Test is
         for TG of All_Test_Groups loop
             for T of TG loop
                 declare
+                    Previous_Num_Tests : Integer := Gather_Op.Num_Total_Tests;
+                    use all type Ada.Containers.Count_Type;
                 begin
                     Gather_Op.Current_Test := T;
                     T(Gather_Op);
+
+                    if Gather_Op.Num_Total_Tests = Previous_Num_Tests then
+                        raise Unregistered_Test with "Test procedure did not call register";
+                    end if;
+
+                    if Gather_Op.Num_Total_Tests /= Previous_Num_Tests + 1 then
+                        raise Multiply_Registered_Test with "Test procedure called register multiple times";
+                    end if;
                 exception
                     when Test_Registered => null;
                     when Test_Disabled => null;

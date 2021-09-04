@@ -16,3 +16,4 @@ Types of changes:
 
 - ✅ Added error when tests do not call `Register`
 - 🛠️ Fixed assertion reports to allow jump-to-line to work in IDE.
+- ✅ Added failure exit code return to `Print_Basic_Report` when a test fails.

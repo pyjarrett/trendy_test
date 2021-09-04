@@ -2,6 +2,7 @@ with Ada.Calendar;
 with Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
+with Ada.Command_Line;
 
 package body Trendy_Test.Reports is
 
@@ -45,6 +46,9 @@ package body Trendy_Test.Reports is
         Total := Fails + Passes;
         Put_Line ("Results: Passed: " & Passes'Image & " / " & Total'Image);
         New_Line;
-    end Print_Basic_Report;
 
+        if Fails > 0 then
+            Ada.Command_Line.Set_Exit_Status (Ada.Command_Line.Failure);
+        end if;
+    end Print_Basic_Report;
 end Trendy_Test.Reports;

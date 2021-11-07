@@ -74,29 +74,36 @@ package Trendy_Test is
                     Message   : String;
                     Loc       : Source_Location := Make_Source_Location);
 
+    -- A boolean check which must be passed for the test to continue.
     procedure Assert (Op        : in out Operation'Class;
                       Condition : Boolean;
                       Loc       : Source_Location := Make_Source_Location);
-    -- A boolean check which must be passed for the test to continue.
 
+    -- A generic assertion of a discrete type, which can be compared using a
+    -- binary operator.  This operation includes a string which can be used
+    -- during reporting.
     generic
         type T is (<>);
-
-        -- How this operand should be reported.
-        Operand : String;
+        Operand : String;  -- An infix description of how to report this operand.
         with function Comparison(Left : T; Right : T) return Boolean;
-    procedure Assert_Discrete(Op    : in out Operation'Class;
-                              Left  : in T;
-                              Right : in T;
-                              Loc   : Source_Location := Make_Source_Location);
+    procedure Generic_Assert_Discrete(
+        Op    : in out Operation'Class;
+        Left  : T;
+        Right : T;
+        Loc   : Source_Location := Make_Source_Location);
 
+    -- A generic assertion which assumes that = and /= are opposite operations.
+    --
+    -- Names with a Generic_* prefix to save the "Assert_EQ" name to prevent
+    -- ambiguities with overrides.
     generic
         type T is private;
         with function Image(Self : T) return String;
-    procedure Assert_EQ(Op    : in out Operation'Class;
-                        Left  : T;
-                        Right : T;
-                        Loc   : Source_Location := Make_Source_Location);
+    procedure Generic_Assert_EQ(
+        Op    : in out Operation'Class;
+        Left  : T;
+        Right : T;
+        Loc   : Source_Location := Make_Source_Location);
 
     ---------------------------------------------------------------------------
     --
@@ -106,6 +113,8 @@ package Trendy_Test is
     -- include gathering test names for filtering, or running the tests themselves.
     type Test_Procedure is access procedure (Op : in out Operation'Class);
 
+    -- A group of related procedures of which any could either be tested
+    -- sequentially or in parallel.
     type Test_Group is array (Positive range <>) of Test_Procedure;
 
     -- Used by Test to indicate a failure.

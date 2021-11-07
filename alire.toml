@@ -1,6 +1,6 @@
 name = "trendy_test"
 description = "Minimal Effort Ada Unit Testing Library"
-version = "0.0.1"
+version = "0.0.2"
 website = "https://github.com/pyjarrett/trendy_test"
 
 authors = ["Paul Jarrett"]

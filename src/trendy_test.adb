@@ -12,24 +12,6 @@ with GNAT.Traceback.Symbolic;
 
 package body Trendy_Test is
 
-    package body Locations is
-        function Make_Source_Location (File : Char_Ptr := File_Name;
-                                       Line : Natural := File_Line) return Source_Location is
-        begin
-            return (File, Line);
-        end Make_Source_Location;
-
-        function Image (Loc : Source_Location) return String is
-            use Ada.Strings;
-            use Ada.Strings.Fixed;
-        begin
-            -- The trimming step here removes the extra space printed to the
-            -- left and hence reports filename:line which editors can use to
-            -- jump directly to errors.
-            return Image (Loc.File) & ':' & Trim (Loc.Line'Image, Left);
-        end Image;
-    end Locations;
-
     procedure Register (Op           : in out Operation'Class;
                         Name         : String := Image (Subprogram_Name);
                         Disabled     : Boolean := False;
@@ -56,7 +38,7 @@ package body Trendy_Test is
         if Disabled then
             raise Test_Registered;
         end if;
-        
+
         Self.Current_Name := ASU.To_Unbounded_String(Name);
 
         if Parallelize then
@@ -104,54 +86,12 @@ package body Trendy_Test is
         raise Test_Failure with "Assertion Failed: (" & Error & ") at " & Image (Loc);
     end Report_Failure;
 
-    procedure Fail (Op        : in out Operation'Class;
-                    Message   : String;
-                    Loc       : Source_Location := Make_Source_Location) is
-    begin
-        Op.Report_Failure (Message, Loc);
-    end Fail;
-
-    procedure Assert (Op  : in out Operation'Class; Condition : Boolean;
-                      Loc : Source_Location := Make_Source_Location) is
-    begin
-        if not Condition then
-            Op.Report_Failure("", Loc);
-        end if;
-    end Assert;
-
-    procedure Generic_Assert_Discrete (Op    : in out Operation'Class;
-                                       Left  : T;
-                                       Right : T;
-                                       Loc   : Source_Location := Make_Source_Location)
-    is
-        Message : constant String := Left'Image & ' ' & Operand & ' ' & Right'Image;
-    begin
-        if not Comparison(Left, Right) then
-            Op.Report_Failure (Message, Loc);
-        end if;
-    end Generic_Assert_Discrete;
-
-    procedure Generic_Assert_EQ (
-        Op    : in out Operation'Class;
-        Left  : T;
-        Right : T;
-        Loc   : Source_Location := Make_Source_Location)
-    is
-        Message : constant String := Image(Left) & " /= " & Image(Right);
-    begin
-        pragma Assert ((not (Left = Right)) = (Left /= Right));
-        if Left /= Right then
-            Op.Report_Failure (Message, Loc);
-        end if;
-    end Generic_Assert_EQ;
-
     function "and" (Left, Right: Test_Result) return Test_Result is
         Either_Failed : constant Boolean := Left = Failed or else Right = Failed;
         Both_Skipped : constant Boolean := Left = Skipped and then Right = Skipped;
     begin
         return (if Either_Failed then Failed else (if Both_Skipped then Skipped else Passed));
     end "and";
-
 
     procedure Register (TG : in Test_Group) is
     begin

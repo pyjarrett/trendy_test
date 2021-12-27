@@ -1,9 +1,16 @@
 with Trendy_Test;
-with Trendy_Test.Discrete_Assertions;
 
 package Trendy_Test.Assertions is
 
-    package Integer_Assertions is new Trendy_Test.Discrete_Assertions(Integer);
+    -- Forcibly fail a test.
+    procedure Fail (Op        : in out Operation'Class;
+                    Message   : String;
+                    Loc       : Source_Location := Make_Source_Location);
+
+    -- A boolean check which must be passed for the test to continue.
+    procedure Assert (Op        : in out Operation'Class;
+                      Condition : Boolean;
+                      Loc       : Source_Location := Make_Source_Location);
 
     procedure Assert_EQ (Op    : in out Trendy_Test.Operation'Class;
                          Left  : String;

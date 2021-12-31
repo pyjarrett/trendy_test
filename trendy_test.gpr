@@ -1,7 +1,7 @@
 project Trendy_Test is
 
    for Library_Name use "Trendy_Test";
-   for Library_Version use "0.0.0";
+   for Library_Version use "0.0.3";
 
    for Source_Dirs use ("src");
    for Object_Dir use "obj";

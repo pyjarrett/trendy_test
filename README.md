@@ -1,3 +1,4 @@
+
 # trendy_test
 
 Minimum Effort Ada Unit Testing Library
@@ -16,7 +17,11 @@ Minimum Effort Ada Unit Testing Library
 ```ada
 with Ada.Text_IO;
 with Trendy_Test;
+with Trendy_Test.Assertions.Integer_Assertions;
 with Trendy_Test.Reports;
+
+use Trendy_Test.Assertions;
+use Trendy_Test.Assertions.Integer_Assertions;
 
 procedure My_Test_Main is
 begin
@@ -38,19 +43,19 @@ package body My_Tests is
     begin
         -- Don't put anything above here you don't want run during listing/other ops.
         T.Register;
-        T.Assert (Some_Expression);
+        Assert (T, Some_Expression);
     end Test_Sample;
 
     procedure Test_Is_Disabled (T : in out Trendy_Test.Operation'Class) is
     begin
         T.Register(Disabled => True);  -- Disabled, don't run this test.
-        T.Assert (Some_Expression);
+        Assert (T, Some_Expression);
     end Test_Sample;
 
     procedure Test_Is_Not_Run_In_Parallel (T : in out Trendy_Test.Operation'Class) is
     begin
         T.Register(Parallelize => False);  -- There's some dependency, so don't run it in parallel.
-        T.Assert (Some_Expression);
+        Assert (T, Some_Expression);
     end Test_Sample;
 
     function All_Tests return Trendy_Test.Test_Group is

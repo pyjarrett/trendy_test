@@ -16,9 +16,11 @@ Minimum Effort Ada Unit Testing Library
 
 ```ada
 with Ada.Text_IO;
-with Trendy_Test;
+
 with Trendy_Test.Assertions.Integer_Assertions;
 with Trendy_Test.Reports;
+
+with My_Tests;
 
 use Trendy_Test.Assertions;
 use Trendy_Test.Assertions.Integer_Assertions;
@@ -34,7 +36,7 @@ end My_Test_Main;
 with Trendy_Test;
 package My_Tests is
     function All_Tests return Trendy_Test.Test_Group;
-end Trendy_Command_Line_Tests;
+end My_Tests;
 
 ----------------------------------------------------------------
 
@@ -50,13 +52,13 @@ package body My_Tests is
     begin
         T.Register(Disabled => True);  -- Disabled, don't run this test.
         Assert (T, Some_Expression);
-    end Test_Sample;
+    end Test_Is_Disabled;
 
     procedure Test_Is_Not_Run_In_Parallel (T : in out Trendy_Test.Operation'Class) is
     begin
         T.Register(Parallelize => False);  -- There's some dependency, so don't run it in parallel.
         Assert (T, Some_Expression);
-    end Test_Sample;
+    end Test_Is_Not_Run_In_Parallel;
 
     function All_Tests return Trendy_Test.Test_Group is
     begin

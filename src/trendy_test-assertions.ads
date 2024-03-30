@@ -1,5 +1,3 @@
-with Trendy_Test;
-
 package Trendy_Test.Assertions is
 
     -- Forcibly fail a test.

@@ -1,9 +1,4 @@
-with Trendy_Locations;
-
 package Trendy_Test.Generics is
-
-    use Trendy_Locations;
-
     -- A generic assertion of a discrete type, which can be compared using a
     -- binary operator.  This operation includes a string which can be used
     -- during reporting.

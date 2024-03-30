@@ -2,7 +2,6 @@ with Ada.Containers.Synchronized_Queue_Interfaces;
 with Ada.Containers.Unbounded_Synchronized_Queues;
 with Ada.Exceptions;
 with Ada.Numerics.Discrete_Random;
-with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO;
 
@@ -247,8 +246,7 @@ package body Trendy_Test is
         for TG of All_Test_Groups loop
             for T of TG loop
                 declare
-                    Previous_Num_Tests : Integer := Gather_Op.Num_Total_Tests;
-                    use all type Ada.Containers.Count_Type;
+                    Previous_Num_Tests : constant Integer := Gather_Op.Num_Total_Tests;
                 begin
                     Gather_Op.Current_Test := T;
                     T(Gather_Op);

@@ -1,6 +1,6 @@
 name = "trendy_test"
 description = "Minimal Effort Ada Unit Testing Library"
-version = "0.0.3"
+version = "0.0.4"
 website = "https://github.com/pyjarrett/trendy_test"
 
 authors = ["Paul Jarrett"]
@@ -128,3 +128,19 @@ Results: Passed:  12 /  14
 ```
 
 '''
+
+[build-switches]
+"*".Debug_Info = "Yes"
+"*".Contracts = "Yes"
+"*".Runtime_Checks = [
+    "-gnato",        # Enable numeric overflow checking;
+    "-fstack-check", # Stack overflow checking
+    "-gnatVa"        # All validity checks
+]
+"*".Compile_Checks = "Errors"
+"*".Ada_Version = "Ada2022"
+"*".Style_Checks = [
+    "-gnaty-d",   # Disable no DOS line terminators
+    "-gnatyM200", # Maximum line length
+    "-gnatyO"     # Overriding subprograms explicitly marked as such]
+]

@@ -33,6 +33,11 @@ package Trendy_Test is
                         Disabled    : Boolean := False;
                         Parallelize : Boolean := True) is abstract;
 
+    -- A boolean check which must be passed for the test to continue.
+    procedure Assert (Op        : in out Operation'Class;
+                      Condition : Boolean;
+                      Loc       : Source_Location := Make_Source_Location);
+
     -- Test procedures might be called with one of many test operations.  This could
     -- include gathering test names for filtering, or running the tests themselves.
     type Test_Procedure is access procedure (Op : in out Operation'Class);

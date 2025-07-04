@@ -9,7 +9,14 @@ with System.Multiprocessors;
 
 with GNAT.Traceback.Symbolic;
 
+with Trendy_Test.Assertions;
+
 package body Trendy_Test is
+
+    procedure Assert (Op        : in out Operation'Class;
+                      Condition : Boolean;
+                      Loc       : Source_Location := Make_Source_Location)
+      renames Trendy_Test.Assertions.Assert;
 
     procedure Register (Op           : in out Operation'Class;
                         Name         : String := Image (Subprogram_Name);

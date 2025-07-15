@@ -214,14 +214,16 @@ package body Trendy_Test is
             End_Time := Ada.Calendar.Clock;
             Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
                         Failure => Ada.Strings.Unbounded.To_Unbounded_String(
-                            Ada.Exceptions.Exception_Message (Error) &
-                           GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
+                            Ada.Exceptions.Exception_Message (Error)),
+                        Traceback => Ada.Strings.Unbounded.To_Unbounded_String(
+                            GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
         when Error : others =>
             End_Time := Ada.Calendar.Clock;
             Results.Add(Test_Report'(Instance.Name, Failed, Start_Time, End_Time,
                         Failure => Ada.Strings.Unbounded.To_Unbounded_String(
-                            Ada.Exceptions.Exception_Message (Error) &
-                           GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
+                            Ada.Exceptions.Exception_Message (Error)),
+                        Traceback => Ada.Strings.Unbounded.To_Unbounded_String(
+                            GNAT.Traceback.Symbolic.Symbolic_Traceback (Error))));
     end Run_Test;
 
     function Run return Test_Report_Vectors.Vector is

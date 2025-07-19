@@ -40,6 +40,7 @@ package body Trendy_Test.Reports is
 
             if R.Status = Failed then
                 Put_Line ("         " & R.Failure);
+                Put_Line ("         " & R.Traceback);
             end if;
         end loop;
 

@@ -54,6 +54,7 @@ package Trendy_Test is
         Status               : Test_Result;
         Start_Time, End_Time : Ada.Calendar.Time;
         Failure              : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
+        Traceback            : Ada.Strings.Unbounded.Unbounded_String := Ada.Strings.Unbounded.Null_Unbounded_String;
     end record;
 
     function "<"(Left, Right : Test_Report) return Boolean;

@@ -11,6 +11,7 @@ Minimum Effort Ada Unit Testing Library
 - Parallelization of tests
 - Randomization of test order to find dependencies between tests
 - No generated code or scripts needed
+- [JUnit XML reports and GitLab integration](docs/gitlab.md)
 
 ## Example
 

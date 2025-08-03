@@ -12,8 +12,7 @@ Types of changes:
 - 🛠️ `Fixed` for any bug fixes.
 - 💥💥💥 `Security` in case of vulnerabilities. Triple 💥 for emphasis.
 
-## Unreleased
+## 0.0.4
 
-- ✅ Added error when tests do not call `Register`
-- 🛠️ Fixed assertion reports to allow jump-to-line to work in IDE.
-- ✅ Added failure exit code return to `Print_Basic_Report` when a test fails.
+- ✅ JUnit XML reports
+- ✅ `Assert` is now available in root package of `Trendy_Test`.
